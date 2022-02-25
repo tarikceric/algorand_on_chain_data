@@ -19,13 +19,14 @@ The data exploration in this repository includes:
 get_wallet_balance:
 * A list of wallets (from data/wallet_addresses.txt) are searched though the blockchain and their current balances are populated into a dataframe. 
 * The transaction history of a single wallet is extracted from the blockchain and populated into a dataframe.
-* This script prints out the results of the results above
+* This script prints out the results above
+
 algorand_transactions:
 * Outputs a csv into /data containing transaction information for the Algorand blockchain over a specified timeframe
-* Tranaction data is requested in batches of one hour increments
+* Transaction data is requested in batches of one hour increments
 
 ## Set up:
-* Insert API key and API address in the config.py file (warning: Algoexplorer API is rather slow)
+* Insert API key and API address in the config file (warning: Using Algoexplorer API is rather slow, and faster processing occurs via the Purestake.io API which requires signing up to get an API key.)
 * Install required libraries via pip install -r requirements.txt
 * To set up a node, see notes below
 	
