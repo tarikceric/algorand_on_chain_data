@@ -12,6 +12,7 @@ In order to provide more practical functionality, the scripts are set up to be a
 The data exploration in this repository is:
 * Getting wallet balances from a list of wallets
 * Accessing transaction data from a wallet over a specified amount of time
+* Get all blockchain transactions over a period of time and aggregate the data to get a complete summary
 	
 ## Scripts:
 
