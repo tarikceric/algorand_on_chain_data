@@ -128,7 +128,7 @@ def clean_dataframe(df):
 
     return df
 
-def blockchain_timeframe_summary(final_df):
+def blockchain_timeframe_summary(final_df,config):
     """
     Get summary statistics
 
@@ -141,11 +141,11 @@ def blockchain_timeframe_summary(final_df):
     summary['from_time'] = config['START_TIME']
     summary['to_time'] = config['END_TIME']
     summary['count_unique_assets'] = final_df['asset-id-asset-transfer-tx'].nunique()
-    summary['count_unique_applications'] = final_df['asset-id-asset-transfer-tx'].nunique()
+    summary['count_unique_applications'] = final_df['application-id-application-tx'].nunique()
 
-    tx_type_summary = final_df['tx-type'].value_counts().to_dict()
-    final = summary.update(tx_type_summary)
-    return final
+    #tx_type_summary = final_df['tx-type'].value_counts().to_dict()
+    #final = summary.update(tx_type_summary)
+    return summary
 
 
 def write_summary_to_csv(summary_dict):
@@ -163,9 +163,8 @@ def write_summary_to_csv(summary_dict):
     if os.path.exists(output_folder):
         print (f"Outputing summary csv to {output_folder}")
         with open(os.path.join(output_folder, file_name), 'w') as f:
-            writer = csv.writer(f)
-            for key, value in summary_dict.items():
-                writer.writerow([key, value])
+            for key in summary_dict.keys():
+                f.write("%s,%s\n"%(key, summary_dict[key]))
 
     else:
         print("Folder for output data is missing")
@@ -180,7 +179,7 @@ def main():
 
     tx_data_df = clean_dataframe(tx_responses)
 
-    summary = blockchain_timeframe_summary(tx_data_df)
+    summary = blockchain_timeframe_summary(tx_data_df, config)
 
     write_summary_to_csv(summary)
 

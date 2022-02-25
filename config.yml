@@ -1,6 +1,6 @@
-URL: https://mainnet-algorand.api.purestake.io/idx2
+URL: https://algoindexer.algoexplorerapi.io
 TOKEN:
-X-API-KEY: cSRypt6d0Z7lP73jqLb5k78cWnej9cVb7DYC0eqI
+X-API-KEY:
 
 START_TIME: "2022-02-15T00:00:00-00:00"
 END_TIME: "2022-02-15T01:00:00-00:00"
@@ -10,5 +10,4 @@ END_TIME: "2022-02-15T01:00:00-00:00"
 # For self-managed node = http://localhost:8980 and change port if necessary
 # For Purestake api = https://mainnet-algorand.api.purestake.io/idx2 and include X-API-KEY
 # For Algoexplorer api = https://algoindexer.algoexplorerapi.io
-#START_TIME: "2022-02-15T00:00:00-00:00"
-#END_TIME: "2022-02-15T01:00:00-00:00"
+
