@@ -4,7 +4,6 @@ import pandas as pd
 import yaml
 import sys
 import algosdk
-import urllib
 
 def loadConfig(config_file):
     """
@@ -32,7 +31,7 @@ def connect(config):
     indexer_client = indexer.IndexerClient(token, url, headers)
     try:
         indexer_client.health()
-    except urllib.error.URLError as e:
+    except (TypeError, algosdk.error.IndexerHTTPError) as e:
         print(f"Indexer not properly connected - check config file: {e}")
         sys.exit(1)
 
@@ -59,26 +58,24 @@ def get_wallet_balances(indexer_client, addresses):
     :param addresses: text file of Algorand addresses
     """
     df = pd.DataFrame()
+    #Initialize an empty list to store incorrect addresses
+    invalid_address = []
     for address in addresses:
-        #If 5 consecutive addresses return an error then source dataset must be checked
-        for attempt in range(5):
-            try:
-                print(f"Retrieving data for Algorand wallet : {address}")
-                response = indexer_client.account_info(address=address)
+        try:
             # get the asset holdings
-            except algosdk.error.IndexerHTTPError as e:
-                print(f"{e}")
-                print('Logging and proceeding to next address')
-            else:
-                break
+            print(f"Retrieving data for Algorand wallet : {address}")
+            response = indexer_client.account_info(address=address)
+        except algosdk.error.IndexerHTTPError as e:
+            #if there is an error with a wallet, store it in the 'invalid_address' list
+            print(f"{e}")
+            invalid_address.append(address)
+            print('Logging and proceeding to next address')
+            continue
         else:
-            print("5 consecutive addresses failed to read - check data source")
-            sys.exit(1)
-
-        # Extract only the total algo balance
-        # Balances are converted from Microalgo to Algo (10^6)
-        balance = response['account']['amount'] / (10**6)
-        df=df.append({'account': address, 'balance': balance}, ignore_index=True)
+            # Extract only the total algo balance
+            # Balances are converted from Microalgo to Algo (10^6)
+            balance = response['account']['amount'] / (10 ** 6)
+            df = df.append({'account': address, 'balance': balance}, ignore_index=True)
     return df
 
 def transactionHistory(indexer_client, addresses, config):
@@ -99,7 +96,8 @@ def transactionHistory(indexer_client, addresses, config):
         print(f"Retrieving transaction data for wallet {wallet_address} beginning at {start_time}")
         response = indexer_client.search_transactions_by_address(address=wallet_address, start_time=start_time)
     except algosdk.error.IndexerHTTPError as e:
-        return e
+        print(f"{wallet_address} is an invalid address: {e}")
+        sys.exit(1)
 
     #extract specific fields from the response and insert into a dataframe
     for x in response['transactions']:
@@ -126,8 +124,6 @@ def main():
 
     print("Wallet data for specified address\n" + wallet_info_df.to_string())
     print("Transaction data for single wallet\n" + transaction_history_df.to_string())
-
-main()
 
 if __name__ == "__main__":
     main()
