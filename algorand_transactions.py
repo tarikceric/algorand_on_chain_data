@@ -36,7 +36,7 @@ def connect(config):
     indexer_client = indexer.IndexerClient(token, url, headers)
     try:
         indexer_client.health()
-    except urllib.error.URLError as e:
+    except (TypeError, algosdk.error.IndexerHTTPError) as e:
         print(f"Indexer not properly connected: {e}")
         sys.exit(1)
 
@@ -67,7 +67,7 @@ def get_transaction_response(indexer_client, config):
                                                           next_page=nexttoken, limit=1000)
         except algosdk.error.IndexerHTTPError as e:
             print(f"Attempt to adjust batch size: {e}")
-            sys.exit()
+            sys.exit(1)
 
         transactions = response['transactions']
         responses += transactions
@@ -143,8 +143,8 @@ def blockchain_timeframe_summary(final_df,config):
     summary['count_unique_assets'] = final_df['asset-id-asset-transfer-tx'].nunique()
     summary['count_unique_applications'] = final_df['application-id-application-tx'].nunique()
 
-    #tx_type_summary = final_df['tx-type'].value_counts().to_dict()
-    #final = summary.update(tx_type_summary)
+    tx_type_summary = final_df['tx-type'].value_counts().to_dict()
+    summary.update(tx_type_summary)
     return summary
 
 

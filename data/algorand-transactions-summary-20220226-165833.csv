@@ -1,0 +1,10 @@
+total_transactions,56544
+from_time,2022-02-15T00:00:00-00:00
+to_time,2022-02-15T01:00:00-00:00
+count_unique_assets,683
+count_unique_applications,157
+axfer,40206
+pay,10157
+appl,6058
+acfg,103
+afrz,20
