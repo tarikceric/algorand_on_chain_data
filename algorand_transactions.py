@@ -4,13 +4,12 @@ import pandas as pd
 import yaml
 import sys
 import algosdk
-import urllib
-import csv
 import time
 from dateutil.rrule import HOURLY, rrule
 from dateutil.parser import parse
 
-def loadConfig(config_file):
+
+def load_config(config_file):
     """
     Function to load yaml configuration file
     :param config_file: name of config file in directory
@@ -24,6 +23,7 @@ def loadConfig(config_file):
 
     return config
 
+
 def connect(config):
     """
     Connect to the Indexer client to access data on a node
@@ -32,7 +32,7 @@ def connect(config):
     token = config['TOKEN']
     headers = ""
     if config['X-API-KEY']:
-        headers = {"X-API-KEY": config['X-API-KEY'],}
+        headers = {"X-API-KEY": config['X-API-KEY'], }
     indexer_client = indexer.IndexerClient(token, url, headers)
     try:
         indexer_client.health()
@@ -41,6 +41,7 @@ def connect(config):
         sys.exit(1)
 
     return indexer_client
+
 
 def get_transaction_response(indexer_client, config):
     """
@@ -77,14 +78,15 @@ def get_transaction_response(indexer_client, config):
             nexttoken = response['next-token']
     return responses
 
+
 def get_transaction_in_chunks(config, indexer_client):
     """
-    Splits the timeframe into 1 hour segments for requesting the addreses. This account for limitations on the
-     number of requests and thee duration which may result in time-out errors.
+    Splits the timeframe into 1 hour segments for requesting the addreses. This accounts for limitations on the
+     number of requests and the duration which may result in time-out errors.
 
     """
 
-    #Get the date to proper format
+    # Get the date to proper format
     start = config['START_TIME'][:-6]
     end = config['END_TIME'][:-6]
     chars_to_remove = ["-", ":"]
@@ -107,11 +109,12 @@ def get_transaction_in_chunks(config, indexer_client):
 
     return df
 
+
 def clean_dataframe(df):
     """
     Extracts dict fields into their own columns and cleans up the dataframe.
 
-    :param transactions: A df of address query responses
+    :param df: A dataframe of address query responses
     """
 
     df = pd.concat([df.drop(['asset-transfer-transaction'], axis=1),
@@ -128,20 +131,21 @@ def clean_dataframe(df):
 
     return df
 
-def blockchain_timeframe_summary(final_df,config):
+
+def blockchain_timeframe_summary(final_df, config):
     """
     Get summary statistics
 
-    :param df: The full dataframe of address information from the blockchain
+    :param final_df: The full dataframe of address information from the blockchain
+    :param config: configuration file for including start/end times in output dataframe
     """
 
     print("Getting summary counts of analysis")
-    summary = {}
-    summary['total_transactions'] = len(final_df)
-    summary['from_time'] = config['START_TIME']
-    summary['to_time'] = config['END_TIME']
-    summary['count_unique_assets'] = final_df['asset-id-asset-transfer-tx'].nunique()
-    summary['count_unique_applications'] = final_df['application-id-application-tx'].nunique()
+    summary = {'total_transactions': len(final_df),
+               'from_time': config['START_TIME'],
+               'to_time': config['END_TIME'],
+               'count_unique_assets': final_df['asset-id-asset-transfer-tx'].nunique(),
+               'count_unique_applications': final_df['application-id-application-tx'].nunique()}
 
     tx_type_summary = final_df['tx-type'].value_counts().to_dict()
     summary.update(tx_type_summary)
@@ -161,7 +165,7 @@ def write_summary_to_csv(summary_dict):
     file_name = "algorand-transactions-summary-" + timestr + '.csv'
 
     if os.path.exists(output_folder):
-        print (f"Outputing summary csv to {output_folder}")
+        print(f"Outputing summary csv to {output_folder}")
         with open(os.path.join(output_folder, file_name), 'w') as f:
             for key in summary_dict.keys():
                 f.write("%s,%s\n"%(key, summary_dict[key]))
@@ -171,7 +175,7 @@ def write_summary_to_csv(summary_dict):
 
 
 def main():
-    config = loadConfig('config.yml')
+    config = load_config('config.yml')
 
     indexer_client = connect(config)
 
@@ -183,6 +187,6 @@ def main():
 
     write_summary_to_csv(summary)
 
+
 if __name__ == "__main__":
     main()
-

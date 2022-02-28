@@ -5,7 +5,8 @@ import yaml
 import sys
 import algosdk
 
-def loadConfig(config_file):
+
+def load_config(config_file):
     """
     Function to load yaml configuration file
     :param config_file: name of config file in directory
@@ -19,6 +20,7 @@ def loadConfig(config_file):
 
     return config
 
+
 def connect(config):
     """
     Connect to the Indexer client to access data on a node
@@ -27,7 +29,7 @@ def connect(config):
     token = config['TOKEN']
     headers = ""
     if config['X-API-KEY']:
-        headers = {"X-API-KEY": config['X-API-KEY'],}
+        headers = {"X-API-KEY": config['X-API-KEY'], }
     indexer_client = indexer.IndexerClient(token, url, headers)
     try:
         indexer_client.health()
@@ -38,7 +40,7 @@ def connect(config):
     return indexer_client
 
 
-def read_txt ():
+def read_txt():
     """
     Access a .txt file included in the project folder
     """
@@ -58,7 +60,7 @@ def get_wallet_balances(indexer_client, addresses):
     :param addresses: text file of Algorand addresses
     """
     df = pd.DataFrame()
-    #Initialize an empty list to store incorrect addresses
+    # Initialize an empty list to store incorrect addresses
     invalid_address = []
     for address in addresses:
         try:
@@ -66,7 +68,7 @@ def get_wallet_balances(indexer_client, addresses):
             print(f"Retrieving data for Algorand wallet : {address}")
             response = indexer_client.account_info(address=address)
         except algosdk.error.IndexerHTTPError as e:
-            #if there is an error with a wallet, store it in the 'invalid_address' list
+            # if there is an error with a wallet, store it in the 'invalid_address' list
             print(f"{e}")
             invalid_address.append(address)
             print('Logging and proceeding to next address')
@@ -78,7 +80,8 @@ def get_wallet_balances(indexer_client, addresses):
             df = df.append({'account': address, 'balance': balance}, ignore_index=True)
     return df
 
-def transactionHistory(indexer_client, addresses, config):
+
+def transaction_history(indexer_client, addresses, config):
     """
     Access the first wallet in a text file of Algorand wallet addresses and return a dataframe with transaction history
     at a specified start time.
@@ -99,20 +102,19 @@ def transactionHistory(indexer_client, addresses, config):
         print(f"{wallet_address} is an invalid address: {e}")
         sys.exit(1)
 
-    #extract specific fields from the response and insert into a dataframe
+    # extract specific fields from the response and insert into a dataframe
     for x in response['transactions']:
-        txAmount = x['payment-transaction']['amount']
-        txId = x['id']
+        tx_amount = x['payment-transaction']['amount']
+        tx_id = x['id']
         receiver = x['payment-transaction']['receiver']
         sender = x['sender']
-        temp_df = pd.DataFrame([{'Tx Amount': txAmount, 'Tx Id': txId, 'Reciever': receiver, 'Sender': sender}])
+        temp_df = pd.DataFrame([{'Tx Amount': tx_amount, 'Tx Id': tx_id, 'Receiver': receiver, 'Sender': sender}])
         df = pd.concat([df, temp_df])
     return df
 
 
 def main():
-
-    config = loadConfig('config.yml')
+    config = load_config('config.yml')
 
     indexer_client = connect(config)
 
@@ -120,10 +122,11 @@ def main():
 
     wallet_info_df = get_wallet_balances(indexer_client, address_list)
 
-    transaction_history_df = transactionHistory(indexer_client, address_list, config)
+    transaction_history_df = transaction_history(indexer_client, address_list, config)
 
     print("Wallet data for specified address\n" + wallet_info_df.to_string())
     print("Transaction data for single wallet\n" + transaction_history_df.to_string())
+
 
 if __name__ == "__main__":
     main()
