@@ -77,7 +77,7 @@ def get_wallet_balances(indexer_client, addresses) -> pd.DataFrame:
             # Extract only the total algo balance
             # Balances are converted from Microalgo to Algo (10^6)
             balance = response['account']['amount'] / (10 ** 6)
-            df = df.append({'account': address, 'balance': balance}, ignore_index=True)
+            df = pd.concat([df, pd.DataFrame([{'account': address, 'balance': balance}])])
     return df
 
 
