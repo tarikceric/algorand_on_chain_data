@@ -6,7 +6,7 @@ import sys
 import algosdk
 
 
-def load_config(config_file):
+def load_config(config_file: str) -> dict:
     """
     Function to load yaml configuration file
     :param config_file: name of config file in directory
@@ -21,7 +21,7 @@ def load_config(config_file):
     return config
 
 
-def connect(config):
+def connect(config) -> indexer.IndexerClient:
     """
     Connect to the Indexer client to access data on a node
     """
@@ -40,7 +40,7 @@ def connect(config):
     return indexer_client
 
 
-def read_txt():
+def read_txt() -> list:
     """
     Access a .txt file included in the project folder
     """
@@ -52,7 +52,7 @@ def read_txt():
         return f.read().splitlines()
 
 
-def get_wallet_balances(indexer_client, addresses):
+def get_wallet_balances(indexer_client, addresses) -> pd.DataFrame:
     """
     Access a list of Algorand wallet addresses and return a dataframe with their balances
 
@@ -81,7 +81,7 @@ def get_wallet_balances(indexer_client, addresses):
     return df
 
 
-def transaction_history(indexer_client, addresses, config):
+def transaction_history(indexer_client, addresses, config) -> pd.DataFrame:
     """
     Access the first wallet in a text file of Algorand wallet addresses and return a dataframe with transaction history
     at a specified start time.

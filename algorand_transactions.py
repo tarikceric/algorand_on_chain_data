@@ -9,7 +9,7 @@ from dateutil.rrule import HOURLY, rrule
 from dateutil.parser import parse
 
 
-def load_config(config_file):
+def load_config(config_file: str) -> dict:
     """
     Function to load yaml configuration file
     :param config_file: name of config file in directory
@@ -24,7 +24,7 @@ def load_config(config_file):
     return config
 
 
-def connect(config):
+def connect(config) -> indexer.IndexerClient:
     """
     Connect to the Indexer client to access data on a node
     """
@@ -43,7 +43,7 @@ def connect(config):
     return indexer_client
 
 
-def get_transaction_response(indexer_client, config):
+def get_transaction_response(indexer_client, config) -> list:
     """
     Returns all transactions from the blockchain between a time period specified in the config file. This retrieves the
     max number of transaction per request (1000), and the 'next token' is used to pick up where the last search ended
@@ -79,7 +79,7 @@ def get_transaction_response(indexer_client, config):
     return responses
 
 
-def get_transaction_in_chunks(config, indexer_client):
+def get_transaction_in_chunks(config, indexer_client) -> pd.DataFrame:
     """
     Splits the timeframe into 1 hour segments for requesting the addreses. This accounts for limitations on the
      number of requests and the duration which may result in time-out errors.
@@ -110,7 +110,7 @@ def get_transaction_in_chunks(config, indexer_client):
     return df
 
 
-def clean_dataframe(df):
+def clean_dataframe(df) -> pd.DataFrame:
     """
     Extracts dict fields into their own columns and cleans up the dataframe.
 
@@ -132,7 +132,7 @@ def clean_dataframe(df):
     return df
 
 
-def blockchain_timeframe_summary(final_df, config):
+def blockchain_timeframe_summary(final_df, config) -> dict:
     """
     Get summary statistics
 
