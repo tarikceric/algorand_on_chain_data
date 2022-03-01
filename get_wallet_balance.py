@@ -104,9 +104,9 @@ def transaction_history(indexer_client, addresses, config) -> pd.DataFrame:
 
     # extract specific fields from the response and insert into a dataframe
     for x in response['transactions']:
-        tx_amount = x['payment-transaction']['amount']
+        tx_amount = x['asset-transfer-transaction']['amount']
         tx_id = x['id']
-        receiver = x['payment-transaction']['receiver']
+        receiver = x['asset-transfer-transaction']['receiver']
         sender = x['sender']
         temp_df = pd.DataFrame([{'Tx Amount': tx_amount, 'Tx Id': tx_id, 'Receiver': receiver, 'Sender': sender}])
         df = pd.concat([df, temp_df])
